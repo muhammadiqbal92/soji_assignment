@@ -1,7 +1,7 @@
 def check_msn_in_constraints(msn: str, constraints: list) -> bool:
-    """Mengecek apakah nomor seri pesawat (MSN) masuk dalam daftar batasan AD."""
+    """Checks whether the aircraft serial number (MSN) falls within the AD constraint list."""
     if not constraints:
-        return True # Jika tidak ada batasan MSN, berarti berlaku untuk semua MSN
+        return True # If there are no MSN constraints, it applies to all MSNs
     
     try:
         msn_int = int(msn)
@@ -23,33 +23,33 @@ def check_msn_in_constraints(msn: str, constraints: list) -> bool:
 
 def evaluate_aircraft(aircraft: dict, ad_rules_json: dict) -> str:
     """
-    Menentukan status pesawat berdasarkan JSON hasil ekstraksi.
-    Kembalian yang diharapkan: "Affected", "Not affected", atau "Not applicable"
+    Determines aircraft status based on extracted JSON.
+    Expected returns: "Affected", "Not affected", or "Not applicable"
     """
     rules = ad_rules_json["applicability_rules"]
     
-    # 1. Cek Kesesuaian Model Pesawat
+    # 1. Check aircraft model match
     if aircraft["model"] not in rules["aircraft_models"]:
         return "Not applicable"
         
-    # 2. Cek Modifikasi Pengecualian (Exclusions)
-    # Jika pesawat memiliki mod yang membebaskannya dari AD ini
+    # 2. Check exclusion modifications
+    # If the aircraft has a mod that exempts it from this AD
     if rules["excluded_if_modifications"]:
         for mod in aircraft["modifications"]:
             if mod in rules["excluded_if_modifications"]:
                 return "Not affected"
                 
-    # 3. Cek Syarat MSN
+    # 3. Check MSN requirements
     if rules["msn_constraints"] is not None:
         if not check_msn_in_constraints(str(aircraft["msn"]), rules["msn_constraints"]):
             return "Not applicable"
             
-    # 4. Cek Syarat Modifikasi Inklusi
-    # Jika AD HANYA berlaku untuk pesawat dengan modifikasi tertentu
+    # 4. Check required modification inclusions
+    # If the AD ONLY applies to aircraft with specific modifications
     if rules["required_modifications"]:
         has_required = any(mod in rules["required_modifications"] for mod in aircraft["modifications"])
         if not has_required:
             return "Not applicable"
 
-    # Jika semua pemeriksaan lolos, pesawat terkena dampak
+    # If all checks pass, the aircraft is affected
     return "Affected"

@@ -25,7 +25,7 @@ def extract_text_from_pdf(pdf_path: str) -> str:
                     text += extracted + "\n"
         return text
     except Exception as e:
-        print(f"Gagal membaca PDF: {e}")
+        print(f"Failed to read PDF: {e}")
         return ""
 
 def parse_ad_rules(pdf_text: str, api_key: str) -> dict:

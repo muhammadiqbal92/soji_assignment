@@ -3,7 +3,7 @@ import os
 from extractor import extract_text_from_pdf, parse_ad_rules
 from evaluator import evaluate_aircraft
 
-# Masukkan API Key Anda di sini
+# Enter your API Key here
 API_KEY = "YOUR_API_KEY_HERE"
 
 test_fleet = [
@@ -14,27 +14,27 @@ test_fleet = [
 
 def main():
     if not os.path.exists("FAA-2025-23-53.pdf") or not os.path.exists("EASA-2025-0254.pdf"):
-        print("ERROR: File PDF tidak ditemukan.")
+        print("ERROR: PDF file not found.")
         return
 
-    print("Mengekstrak FAA AD...")
+    print("Extracting FAA AD...")
     faa_text = extract_text_from_pdf("FAA-2025-23-53.pdf")
     faa_rules = parse_ad_rules(faa_text, API_KEY)
     
-    # Tambahkan jeda 20 detik agar tidak terkena rate limit
-    print("Menunggu sebentar untuk kuota API...")
+    # Add a 20-second pause to avoid hitting rate limits
+    print("Waiting briefly for API quota...")
     time.sleep(20) 
     
-    print("Mengekstrak EASA AD...")
+    print("Extracting EASA AD...")
     easa_text = extract_text_from_pdf("EASA-2025-0254.pdf")
     easa_rules = parse_ad_rules(easa_text, API_KEY)
     
     print("\n" + "="*50)
-    print("              HASIL EVALUASI PESAWAT              ")
+    print("              AIRCRAFT EVALUATION RESULTS              ")
     print("="*50 + "\n")
     
     for aircraft in test_fleet:
-        print(f"Pesawat: {aircraft['model']} | MSN: {aircraft['msn']} | Mods: {aircraft['modifications'][0]}")
+        print(f"Aircraft: {aircraft['model']} | MSN: {aircraft['msn']} | Mods: {aircraft['modifications'][0]}")
         
         faa_status = evaluate_aircraft(aircraft, faa_rules)
         print(f"--> Status FAA AD 2025-23-53 : {faa_status}")
